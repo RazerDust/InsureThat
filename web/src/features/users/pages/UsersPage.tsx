@@ -37,7 +37,9 @@ const actingUserOptions = [
   { label: 'Noah Patel - Southern admin', value: 'usr-noah' },
 ]
 
+// UsersPage is the administration workspace for tenant, user, role, and audit data.
 export function UsersPage() {
+  // The acting user selector lets us test tenant security without real login yet.
   const [actingUserId, setActingUserId] = useState('usr-system-admin')
   const [brokerageName, setBrokerageName] = useState('')
   const [brokerageRegion, setBrokerageRegion] = useState('Queensland')
@@ -51,6 +53,7 @@ export function UsersPage() {
   const roleCount = data?.roles.length ?? 0
 
   const metrics = useMemo(
+    // useMemo recalculates the metric card data only when its counts change.
     () => [
       {
         helper: 'Visible to the acting administrator',
@@ -123,6 +126,7 @@ export function UsersPage() {
       </Card>
 
       <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+        {/* Each metric summarises the rows visible to the selected administrator. */}
         {metrics.map((metric) => (
           <StatCard key={metric.label} {...metric} />
         ))}
@@ -155,6 +159,7 @@ export function UsersPage() {
 
         <Tabs.Panel value="users" pt="md">
           <UserTable
+            // UserTable receives callbacks instead of calling the API directly.
             isSavingPermission={updatePermissionMutation.isPending}
             isSavingRole={updateRoleMutation.isPending}
             onPermissionChange={(userId, permission, isGranted) =>
@@ -201,6 +206,7 @@ export function UsersPage() {
             </Card>
 
             <Stack gap="md">
+              {/* Brokerages are filtered by the API before they reach the browser. */}
               {(data?.brokerages ?? []).map((brokerage) => (
                 <Card className="admin-boundary-panel" key={brokerage.id} padding="lg">
                   <Group justify="space-between">
@@ -226,6 +232,7 @@ export function UsersPage() {
         <Tabs.Panel value="roles" pt="md">
           <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
             {(data?.roles ?? []).map((role) => (
+              // Each role card explains the permission bundle for one tenant-owned role.
               <Card className="admin-boundary-panel" key={role.id} padding="lg">
                 <Group justify="space-between" mb="xs">
                   <Title order={3}>{role.name}</Title>
@@ -250,12 +257,14 @@ export function UsersPage() {
               <Title order={2}>Security rules</Title>
               <List mt="md" spacing="sm">
                 {(data?.securityRules ?? []).map((rule) => (
+                  // These rules are returned by the API as human-readable security notes.
                   <List.Item key={rule}>{rule}</List.Item>
                 ))}
               </List>
             </Card>
 
             <Stack gap="md">
+              {/* The audit trail makes permission and role changes visible. */}
               {(data?.auditLog ?? []).map((entry) => (
                 <Card className="admin-boundary-panel" key={entry.id} padding="lg">
                   <Group justify="space-between" align="flex-start">

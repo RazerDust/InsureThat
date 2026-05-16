@@ -27,6 +27,7 @@ type NavigationItem = {
   to: string
 }
 
+// Keeping navigation in an array makes it easy to add or remove sidebar links later.
 const navigationItems: NavigationItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <IconDashboard size={18} /> },
   { to: '/crm', label: 'CRM', icon: <IconBuildingSkyscraper size={18} /> },
@@ -35,6 +36,7 @@ const navigationItems: NavigationItem[] = [
 ]
 
 export function AppShellLayout() {
+  // Mantine manages the selected colour mode and stores it for future visits.
   const { toggleColorScheme } = useMantineColorScheme()
   const colorScheme = useComputedColorScheme('light')
   const isDarkMode = colorScheme === 'dark'
@@ -54,6 +56,7 @@ export function AppShellLayout() {
 
         <nav className="app-nav" aria-label="Primary navigation">
           {navigationItems.map((item) => (
+            // NavLink tells us when its URL is active, so the sidebar can highlight the current page.
             <NavLink
               key={item.to}
               to={item.to}
@@ -124,6 +127,7 @@ export function AppShellLayout() {
 
         <main className="app-main">
           <div className="app-content">
+            {/* Outlet is where React Router renders the selected child page. */}
             <Outlet />
           </div>
         </main>

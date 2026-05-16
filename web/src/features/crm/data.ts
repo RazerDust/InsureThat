@@ -1,3 +1,5 @@
+// These TypeScript types describe the CRM data the UI expects.
+// They also act as documentation for the matching C# DTOs in the backend.
 export type CrmAccount = {
   id: string
   name: string
@@ -73,6 +75,7 @@ export type CrmActivity = {
   kind: 'Email' | 'Call' | 'AI' | 'Task' | 'Document'
 }
 
+// Local sample data keeps the CRM screen useful if the backend is not running.
 export const crmAccounts: CrmAccount[] = [
   {
     id: 'harbour-fresh',
@@ -374,6 +377,7 @@ export const crmStatusColors = {
   'At risk': 'red',
 } as const satisfies Record<CrmAccount['status'], string>
 
+// Money formatting belongs in one helper so currency values stay consistent.
 export const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-AU', {
     currency: 'AUD',

@@ -8,6 +8,9 @@ import type { PropsWithChildren } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { queryClient } from '../api/queryClient'
 
+// Providers are wrappers that give every page access to shared tools.
+// BrowserRouter enables URL-based navigation, QueryClientProvider manages API cache,
+// and MantineProvider supplies the design system styles.
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <BrowserRouter>

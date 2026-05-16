@@ -27,6 +27,7 @@ const statusColors: Record<string, string> = {
   Suspended: 'red',
 }
 
+// UserTable displays the users the current administrator is allowed to see.
 export function UserTable({
   isSavingPermission,
   isSavingRole,
@@ -36,6 +37,7 @@ export function UserTable({
   users,
 }: UserTableProps) {
   if (users.length === 0) {
+    // An empty table can be a valid security result, not necessarily an error.
     return (
       <EmptyState
         title="No users visible"
@@ -64,6 +66,7 @@ export function UserTable({
               .filter((role) => role.brokerageId === user.brokerageId)
               .map((role) => ({ label: role.name, value: role.id }))
             const hasReportsPermission = user.permissions.includes('reports.view')
+            // Cross-tenant access is unusual, so the UI shows a badge when it exists.
             const hasCrossTenantAccess = user.crossTenantBrokerageIds.length > 0
 
             return (
@@ -95,6 +98,7 @@ export function UserTable({
                 </Table.Td>
                 <Table.Td>
                   <Select
+                    // Changing the select triggers a role update through UsersPage.
                     aria-label={`Change role for ${user.name}`}
                     data={availableRoles}
                     disabled={isSavingRole}
@@ -121,6 +125,7 @@ export function UserTable({
                       }
                     >
                       <ActionIcon
+                        // This button only toggles the reports.view permission in the demo.
                         aria-label={
                           hasReportsPermission
                             ? `Remove reporting permission from ${user.name}`

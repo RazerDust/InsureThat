@@ -1,4 +1,5 @@
 :root {
+  /* App-wide colour tokens. Changing these values updates the whole theme. */
   --app-bg: #f6f8fb;
   --app-border: #dfe5ec;
   --app-panel: #ffffff;
@@ -51,12 +52,14 @@ input {
 }
 
 .app-shell {
+  /* Desktop layout: fixed sidebar on the left, flexible workspace on the right. */
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
   min-height: 100vh;
 }
 
 .app-sidebar {
+  /* The sidebar owns the main product navigation. */
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -105,6 +108,7 @@ input {
 }
 
 .app-topbar {
+  /* Sticky keeps the workspace controls visible while the page scrolls. */
   position: sticky;
   top: 0;
   z-index: 1;
@@ -150,6 +154,7 @@ input {
 }
 
 .dashboard-grid {
+  /* Three dashboard cards on desktop, collapsed to one column on mobile below. */
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
@@ -205,6 +210,7 @@ input {
 }
 
 .crm-command-bar {
+  /* Search, status filter, and work-mode control live in one responsive row. */
   display: grid;
   grid-template-columns: minmax(240px, 1fr) 180px minmax(280px, auto);
   gap: 12px;
@@ -227,6 +233,7 @@ input {
 
 .crm-workspace-grid,
 .crm-account-hero {
+  /* The main CRM views use a wider primary column and a narrower insight column. */
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.85fr);
   gap: 16px;
@@ -309,6 +316,7 @@ input {
 }
 
 @media (max-width: 860px) {
+  /* Mobile layout stacks the sidebar, header, and page content vertically. */
   .app-shell {
     grid-template-columns: 1fr;
   }
