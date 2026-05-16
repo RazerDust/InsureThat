@@ -7,6 +7,7 @@ import {
   Modal,
   NumberInput,
   Progress,
+  Select,
   SimpleGrid,
   Stack,
   Stepper,
@@ -71,8 +72,8 @@ export function CrmAccountPage() {
   }
 
   if (!account) {
-    // If the account cannot be found, send the user back to the CRM overview.
-    return <Navigate to="/crm" replace />
+    // If the account cannot be found, send the user back to the account list.
+    return <Navigate to="/crm/accounts" replace />
   }
 
   // The sample workflow advances further when an account needs review or is at risk.
@@ -104,7 +105,7 @@ export function CrmAccountPage() {
 
     await deleteAccount.mutateAsync(account.id)
     // After deletion, this detail page would no longer have a record to show.
-    navigate('/crm')
+    navigate('/crm/accounts')
   }
 
   return (
@@ -133,6 +134,20 @@ export function CrmAccountPage() {
               onChange={(event) => setForm({ ...form, renewalDate: event.currentTarget.value })}
               value={form.renewalDate}
             />
+            <Select
+              data={['Company', 'Individual', 'Partnership', 'Trust']}
+              label="Entity type"
+              onChange={(value) => setForm({ ...form, entityType: value ?? 'Company' })}
+              value={form.entityType}
+            />
+            <Select
+              data={['Active', 'Review', 'At risk']}
+              label="Status"
+              onChange={(value) =>
+                setForm({ ...form, status: (value as EditAccountForm['status']) ?? 'Active' })
+              }
+              value={form.status}
+            />
             <NumberInput
               label="Premium"
               min={0}
@@ -144,6 +159,13 @@ export function CrmAccountPage() {
               min={0}
               onChange={(value) => setForm({ ...form, revenue: Number(value) || 0 })}
               value={form.revenue}
+            />
+            <NumberInput
+              label="Compliance score"
+              max={100}
+              min={0}
+              onChange={(value) => setForm({ ...form, complianceScore: Number(value) || 0 })}
+              value={form.complianceScore}
             />
             <Textarea
               className="crm-form-span"
@@ -177,10 +199,10 @@ export function CrmAccountPage() {
             <Button
               component={Link}
               leftSection={<IconArrowLeft size={18} />}
-              to="/crm"
+              to="/crm/accounts"
               variant="light"
             >
-              CRM
+              Accounts
             </Button>
             <Button
               leftSection={<IconPencil size={18} />}
