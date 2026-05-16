@@ -41,6 +41,18 @@ public sealed class InMemoryCrmAccountRepository : ICrmAccountRepository
         return Task.FromResult(account);
     }
 
+    public Task<IReadOnlyList<CrmContactRecordDto>> GetContactsAsync(CancellationToken cancellationToken)
+    {
+        // Contacts live inside accounts, so this flattens them for the contacts menu page.
+        var contacts = _accounts.Values
+            .OrderBy(account => account.Name)
+            .SelectMany(account => account.Contacts.Select(contact => CreateContactRecord(account, contact)))
+            .OrderBy(contact => contact.Name)
+            .ToList();
+
+        return Task.FromResult<IReadOnlyList<CrmContactRecordDto>>(contacts);
+    }
+
     public Task<CrmAccountDto> CreateAsync(CreateCrmAccountDto account, CancellationToken cancellationToken)
     {
         var newAccount = new CrmAccountDto
@@ -106,9 +118,65 @@ public sealed class InMemoryCrmAccountRepository : ICrmAccountRepository
         return Task.FromResult<CrmAccountDto?>(CloneAccount(updatedAccount));
     }
 
+    public Task<CrmContactRecordDto?> UpdateContactAsync(
+        string accountId,
+        string contactId,
+        CrmContactDto contact,
+        CancellationToken cancellationToken)
+    {
+        if (!_accounts.TryGetValue(accountId, out var storedAccount))
+        {
+            return Task.FromResult<CrmContactRecordDto?>(null);
+        }
+
+        var contactIndex = storedAccount.Contacts.FindIndex(existingContact => existingContact.Id == contactId);
+
+        if (contactIndex < 0)
+        {
+            return Task.FromResult<CrmContactRecordDto?>(null);
+        }
+
+        // Keep the route id as the source of truth so a form cannot accidentally rename the record id.
+        var updatedContact = new CrmContactDto
+        {
+            Id = contactId,
+            Name = contact.Name,
+            Role = contact.Role,
+            Email = contact.Email,
+            Phone = contact.Phone,
+            Influence = contact.Influence,
+        };
+
+        var updatedAccount = CloneAccount(storedAccount);
+        updatedAccount.Contacts[contactIndex] = updatedContact;
+        _accounts[accountId] = CloneAccount(updatedAccount);
+
+        return Task.FromResult<CrmContactRecordDto?>(CreateContactRecord(updatedAccount, updatedContact));
+    }
+
     public Task<bool> DeleteAsync(string id, CancellationToken cancellationToken)
     {
         return Task.FromResult(_accounts.TryRemove(id, out _));
+    }
+
+    public Task<bool> DeleteContactAsync(string accountId, string contactId, CancellationToken cancellationToken)
+    {
+        if (!_accounts.TryGetValue(accountId, out var storedAccount))
+        {
+            return Task.FromResult(false);
+        }
+
+        var updatedAccount = CloneAccount(storedAccount);
+        var removedCount = updatedAccount.Contacts.RemoveAll(contact => contact.Id == contactId);
+
+        if (removedCount == 0)
+        {
+            return Task.FromResult(false);
+        }
+
+        _accounts[accountId] = CloneAccount(updatedAccount);
+
+        return Task.FromResult(true);
     }
 
     private static string CreateSlug(string value)
@@ -162,6 +230,20 @@ public sealed class InMemoryCrmAccountRepository : ICrmAccountRepository
         Email = contact.Email,
         Phone = contact.Phone,
         Influence = contact.Influence,
+    };
+
+    private static CrmContactRecordDto CreateContactRecord(CrmAccountDto account, CrmContactDto contact) => new()
+    {
+        Id = contact.Id,
+        Name = contact.Name,
+        Role = contact.Role,
+        Email = contact.Email,
+        Phone = contact.Phone,
+        Influence = contact.Influence,
+        AccountId = account.Id,
+        AccountName = account.Name,
+        AccountSegment = account.Segment,
+        AccountOwner = account.Owner,
     };
 
     private static CrmPolicyDto ClonePolicy(CrmPolicyDto policy) => new()

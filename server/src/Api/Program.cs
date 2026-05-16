@@ -1,5 +1,7 @@
 using Application.Interfaces;
+using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 // Program.cs wires up the web server: services first, then the HTTP request pipeline.
 var builder = WebApplication.CreateBuilder(args);
@@ -22,14 +24,38 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register the CRM repository as a singleton so the in-memory data survives
-// for as long as the API process is running.
-builder.Services.AddSingleton<ICrmAccountRepository, InMemoryCrmAccountRepository>();
+// The connection string tells Entity Framework where PostgreSQL is running.
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Missing ConnectionStrings:DefaultConnection in appsettings.json.");
 
-// Register tenant administration data the same way while the database layer is still forming.
-builder.Services.AddSingleton<IAdministrationRepository, InMemoryAdministrationRepository>();
+// DbContext is the main Entity Framework class that reads and writes database rows.
+builder.Services.AddDbContext<InsureThatDbContext>(options =>
+{
+    options.UseNpgsql(connectionString);
+});
+
+// Register database repositories. Scoped means each web request gets a clean repository instance.
+builder.Services.AddScoped<ICrmAccountRepository, CrmAccountRepository>();
+builder.Services.AddScoped<IAdministrationRepository, AdministrationRepository>();
 
 var app = builder.Build();
+
+// During local development this creates the database schema from the C# model
+// and loads demo data when the database is empty.
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var database = scope.ServiceProvider.GetRequiredService<InsureThatDbContext>();
+
+    if (app.Configuration.GetValue("Database:EnsureCreatedOnStartup", true))
+    {
+        await database.Database.EnsureCreatedAsync();
+    }
+
+    if (app.Configuration.GetValue("Database:SeedDemoData", true))
+    {
+        await DatabaseSeeder.SeedAsync(database);
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

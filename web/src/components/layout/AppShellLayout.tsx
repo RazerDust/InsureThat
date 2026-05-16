@@ -30,7 +30,8 @@ type NavigationItem = {
 // Keeping navigation in an array makes it easy to add or remove sidebar links later.
 const navigationItems: NavigationItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <IconDashboard size={18} /> },
-  { to: '/crm', label: 'CRM', icon: <IconBuildingSkyscraper size={18} /> },
+  { to: '/crm/accounts', label: 'Accounts', icon: <IconBuildingSkyscraper size={18} /> },
+  { to: '/crm/contacts', label: 'Contacts', icon: <IconUsers size={18} /> },
   { to: '/users', label: 'Users', icon: <IconUsers size={18} /> },
   { to: '/login', label: 'Sign in', icon: <IconLogin2 size={18} /> },
 ]

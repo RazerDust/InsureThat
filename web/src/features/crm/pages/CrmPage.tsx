@@ -223,7 +223,7 @@ export function CrmPage() {
       </Modal>
 
       <PageHeader
-        title="CRM"
+        title="Accounts"
         description="A broker workspace for accounts, contacts, relationships, activities and AI-assisted client action."
         actions={
           <Group gap="sm">

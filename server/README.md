@@ -26,6 +26,9 @@ The Vite frontend proxy is configured for `http://127.0.0.1:5105`, so using the 
 - `POST /api/crm/accounts` creates a CRM account.
 - `PUT /api/crm/accounts/{id}` updates a CRM account.
 - `DELETE /api/crm/accounts/{id}` deletes a CRM account.
+- `GET /api/crm/contacts` lists contacts across every CRM account.
+- `PUT /api/crm/contacts/{accountId}/{contactId}` updates one contact inside an account.
+- `DELETE /api/crm/contacts/{accountId}/{contactId}` deletes one contact inside an account.
 - `GET /api/admin` returns the tenant administration snapshot.
 - `POST /api/admin/brokerages` creates a brokerage when the acting user is a system administrator.
 - `PUT /api/admin/users/{userId}/role` changes a user's role.

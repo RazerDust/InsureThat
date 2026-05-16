@@ -73,7 +73,7 @@ public sealed class UpdateCrmAccountDto
     public List<CrmActivityDto> Activities { get; set; } = [];
 }
 
-public sealed class CrmContactDto
+public class CrmContactDto
 {
     public required string Id { get; set; }
     public required string Name { get; set; }
@@ -81,6 +81,15 @@ public sealed class CrmContactDto
     public required string Email { get; set; }
     public required string Phone { get; set; }
     public required string Influence { get; set; }
+}
+
+public sealed class CrmContactRecordDto : CrmContactDto
+{
+    // These account fields let the frontend show contacts as their own CRM menu item.
+    public required string AccountId { get; set; }
+    public required string AccountName { get; set; }
+    public required string AccountSegment { get; set; }
+    public required string AccountOwner { get; set; }
 }
 
 public sealed class CrmPolicyDto
