@@ -9,10 +9,12 @@ namespace Infrastructure.Repositories;
 // before the API contract is useful.
 public sealed class InMemoryCrmAccountRepository : ICrmAccountRepository
 {
+    // ConcurrentDictionary is safe for simple reads and writes while the API is running.
     private readonly ConcurrentDictionary<string, CrmAccountDto> _accounts = new();
 
     public InMemoryCrmAccountRepository()
     {
+        // Seed data gives the frontend something realistic to show on first run.
         foreach (var account in SeedAccounts())
         {
             _accounts[account.Id] = account;
@@ -21,6 +23,7 @@ public sealed class InMemoryCrmAccountRepository : ICrmAccountRepository
 
     public Task<IReadOnlyList<CrmAccountDto>> GetAllAsync(CancellationToken cancellationToken)
     {
+        // Return clones so callers cannot mutate the in-memory storage by accident.
         var accounts = _accounts.Values
             .OrderBy(account => account.Name)
             .Select(CloneAccount)
@@ -110,6 +113,7 @@ public sealed class InMemoryCrmAccountRepository : ICrmAccountRepository
 
     private static string CreateSlug(string value)
     {
+        // Slugs make new account ids readable while the Guid suffix keeps them unique.
         var safeCharacters = value
             .Trim()
             .ToLowerInvariant()

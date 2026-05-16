@@ -7,6 +7,7 @@ type PageHeaderProps = {
   title: string
 }
 
+// PageHeader gives every page the same title, helper text, and optional action area.
 export function PageHeader({ actions, description, title }: PageHeaderProps) {
   return (
     <Group className="page-header" justify="space-between" align="flex-start">

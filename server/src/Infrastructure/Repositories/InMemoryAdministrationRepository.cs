@@ -8,6 +8,7 @@ namespace Infrastructure.Repositories;
 // Later, these same rules should move into PostgreSQL row-level security policies too.
 public sealed class InMemoryAdministrationRepository : IAdministrationRepository
 {
+    // These collections simulate database tables until a real database is added.
     private readonly ConcurrentDictionary<string, BrokerageRecord> _brokerages = new();
     private readonly ConcurrentDictionary<string, UserRecord> _users = new();
     private readonly ConcurrentDictionary<string, RoleRecord> _roles = new();
@@ -17,6 +18,7 @@ public sealed class InMemoryAdministrationRepository : IAdministrationRepository
 
     public InMemoryAdministrationRepository()
     {
+        // Seed methods are split by topic so the demo data is easier to follow.
         SeedBrokerages();
         SeedRoles();
         SeedTeamsAndOffices();
@@ -27,6 +29,7 @@ public sealed class InMemoryAdministrationRepository : IAdministrationRepository
     public Task<AdministrationSnapshotDto> GetSnapshotAsync(string actingUserId, CancellationToken cancellationToken)
     {
         var actor = GetActorOrFallback(actingUserId);
+        // Allowed brokerage ids are the core row-level security boundary.
         var allowedBrokerageIds = GetAllowedBrokerageIds(actor);
         var visibleBrokerages = _brokerages.Values
             .Where(brokerage => allowedBrokerageIds.Contains(brokerage.Id))
@@ -180,6 +183,7 @@ public sealed class InMemoryAdministrationRepository : IAdministrationRepository
 
     private HashSet<string> GetAllowedBrokerageIds(UserRecord actor)
     {
+        // System admins see all tenants; normal admins see only their own and explicit grants.
         if (actor.IsSystemAdministrator)
         {
             return _brokerages.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -192,6 +196,7 @@ public sealed class InMemoryAdministrationRepository : IAdministrationRepository
 
     private bool CanManageBrokerage(UserRecord actor, string brokerageId)
     {
+        // Management checks use the same tenant boundary as read checks.
         return actor.IsSystemAdministrator ||
             actor.BrokerageId == brokerageId ||
             actor.CrossTenantBrokerageIds.Contains(brokerageId);
@@ -291,6 +296,7 @@ public sealed class InMemoryAdministrationRepository : IAdministrationRepository
 
     private void AddAudit(UserRecord actor, string brokerageId, string action, string target, string details)
     {
+        // Each sensitive change gets an audit entry for the administration page.
         _auditLog.Enqueue(new AuditRecord(
             $"audit-{Guid.NewGuid():N}",
             DateTimeOffset.UtcNow,
@@ -375,6 +381,7 @@ public sealed class InMemoryAdministrationRepository : IAdministrationRepository
 
     private void AddRole(string id, string brokerageId, string name, string description, List<string> permissions)
     {
+        // Roles package permissions together for users in the same brokerage.
         _roles[id] = new RoleRecord(id, brokerageId, name, description, permissions);
     }
 

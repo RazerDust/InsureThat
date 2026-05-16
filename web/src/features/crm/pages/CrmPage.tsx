@@ -58,6 +58,7 @@ type AccountFormState = {
   status: 'Active' | 'Review' | 'At risk'
 }
 
+// These defaults fill the create-account modal before the broker types anything.
 const emptyAccountForm: AccountFormState = {
   aiSummary: 'New CRM account created by the broker team.',
   complianceScore: 75,
@@ -73,8 +74,11 @@ const emptyAccountForm: AccountFormState = {
 }
 
 export function CrmPage() {
+  // React Query gives us API data, and the local sample data is a fallback for first-run development.
   const { data: accounts = crmAccounts } = useCrmAccounts()
   const createAccount = useCreateCrmAccount()
+
+  // These state values are the user's current view controls.
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [workMode, setWorkMode] = useState('relationship')
@@ -97,6 +101,7 @@ export function CrmPage() {
     })
   }, [accounts, search, statusFilter])
 
+  // Pick a selected account even if the current filter hides the previous selection.
   const selectedAccount =
     filteredAccounts.find((account) => account.id === selectedAccountId) ??
     filteredAccounts[0] ??
@@ -106,6 +111,7 @@ export function CrmPage() {
   const openTasks = accounts.flatMap((account) =>
     account.tasks.filter((task) => task.status !== 'Done'),
   )
+  // These totals power the four metric cards at the top of the CRM page.
   const totalPremium = accounts.reduce((sum, account) => sum + account.premium, 0)
   const averageCompliance = Math.round(
     accounts.reduce((sum, account) => sum + account.complianceScore, 0) /
@@ -146,6 +152,7 @@ export function CrmPage() {
         title="New CRM account"
       >
         <div className="crm-form-grid">
+          {/* Each field writes directly into the form object stored in React state. */}
           <TextInput
             label="Account name"
             onChange={(event) => setForm({ ...form, name: event.currentTarget.value })}
@@ -231,6 +238,7 @@ export function CrmPage() {
       />
 
       <SimpleGrid cols={{ base: 1, md: 4 }} spacing="md">
+        {/* The metric cards translate the CRM records into quick portfolio numbers. */}
         <CrmMetric
           icon={<IconBuildingSkyscraper size={20} />}
           label="Managed accounts"
@@ -296,6 +304,7 @@ export function CrmPage() {
           </Group>
 
           <Table.ScrollContainer minWidth={560}>
+            {/* The account table is scrollable so it still works on smaller screens. */}
             <Table highlightOnHover verticalSpacing="sm">
               <Table.Thead>
                 <Table.Tr>
@@ -359,6 +368,7 @@ export function CrmPage() {
               <Text c="dimmed">{selectedAccount.risk}</Text>
             </div>
             <RingProgress
+              // RingProgress turns the compliance score into a quick visual cue.
               size={92}
               thickness={10}
               sections={[{ value: selectedAccount.complianceScore, color: 'teal' }]}
@@ -382,6 +392,7 @@ export function CrmPage() {
             </Group>
           </Card>
 
+          {/* Tabs reuse the same workMode state as the segmented control above. */}
           <Tabs className="crm-tabs" defaultValue={workMode} value={workMode} onChange={(value) => setWorkMode(value ?? 'relationship')}>
             <Tabs.List>
               <Tabs.Tab leftSection={<IconUsersGroup size={16} />} value="relationship">
@@ -465,6 +476,7 @@ type CrmMetricProps = {
 }
 
 function CrmMetric({ helper, icon, label, value }: CrmMetricProps) {
+  // A small private component keeps repeated metric-card markup easy to scan.
   return (
     <Card className="crm-metric" padding="lg">
       <Group justify="space-between">
@@ -490,6 +502,7 @@ type CrmQueueProps = {
 }
 
 function CrmQueue({ icon, items, title }: CrmQueueProps) {
+  // CrmQueue is used for the compact lists at the bottom of the CRM overview.
   return (
     <Card className="crm-panel" padding="lg">
       <Group gap="sm" mb="md">

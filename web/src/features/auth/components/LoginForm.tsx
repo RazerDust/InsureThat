@@ -6,12 +6,14 @@ import { z } from 'zod'
 import { TextField } from '../../../components/forms/TextField'
 import type { LoginRequest } from '../types'
 
+// Zod gives us a plain-English validation rule for each field.
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 })
 
 export function LoginForm() {
+  // react-hook-form tracks field values, validation errors, and submit state for us.
   const {
     formState: { errors, isSubmitting },
     handleSubmit,
@@ -24,6 +26,7 @@ export function LoginForm() {
   })
 
   const onSubmit = handleSubmit((values) => {
+    // This app does not connect real authentication yet, so we show a success notification for now.
     notifications.show({
       color: 'teal',
       message: `Prepared sign-in for ${values.email}.`,

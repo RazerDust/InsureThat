@@ -4,7 +4,9 @@ namespace Application.DTOs;
 // Keeping this shape explicit makes the tenant security boundary easier to understand.
 public sealed class AdministrationSnapshotDto
 {
+    // CurrentUser explains which administrator the API used to filter the rows below.
     public required CurrentAdministratorDto CurrentUser { get; set; }
+    // These lists are already filtered before they leave the API.
     public List<BrokerageDto> Brokerages { get; set; } = [];
     public List<AdminUserDto> Users { get; set; } = [];
     public List<RoleDto> Roles { get; set; } = [];
@@ -37,6 +39,7 @@ public sealed class BrokerageDto
 
 public sealed class AdminUserDto
 {
+    // Required means the property must be filled before this DTO is valid.
     public required string Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
@@ -95,6 +98,7 @@ public sealed class AuditLogEntryDto
 
 public sealed class CreateBrokerageDto
 {
+    // This request body comes from the "Create brokerage" form in the frontend.
     public required string Name { get; set; }
     public required string Region { get; set; }
     public required string DefaultWorkflow { get; set; }

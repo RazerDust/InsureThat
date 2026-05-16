@@ -8,8 +8,10 @@ import {
 } from './api'
 import type { SaveCrmAccountPayload } from './api'
 
+// Every CRM query starts with the same key so we can refresh the whole CRM cache together.
 const crmAccountsQueryKey = ['crm', 'accounts'] as const
 
+// useCrmAccounts loads the list shown on the CRM overview page.
 export function useCrmAccounts() {
   return useQuery({
     queryKey: crmAccountsQueryKey,
@@ -17,6 +19,7 @@ export function useCrmAccounts() {
   })
 }
 
+// useCrmAccount loads the detail record once React Router gives us an account id.
 export function useCrmAccount(accountId: string) {
   return useQuery({
     queryKey: [...crmAccountsQueryKey, accountId],
@@ -25,6 +28,7 @@ export function useCrmAccount(accountId: string) {
   })
 }
 
+// Mutations change data, then invalidate the list so the page reloads fresh data.
 export function useCreateCrmAccount() {
   const queryClient = useQueryClient()
 
@@ -34,6 +38,7 @@ export function useCreateCrmAccount() {
   })
 }
 
+// This hook saves edits made in the account detail modal.
 export function useUpdateCrmAccount(accountId: string) {
   const queryClient = useQueryClient()
 
@@ -43,6 +48,7 @@ export function useUpdateCrmAccount(accountId: string) {
   })
 }
 
+// This hook removes an account and then refreshes the CRM list.
 export function useDeleteCrmAccount() {
   const queryClient = useQueryClient()
 

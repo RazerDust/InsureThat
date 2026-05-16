@@ -12,9 +12,11 @@ import type {
   UpdateUserRoleRequest,
 } from '../types'
 
+// The acting user id is part of the key because each admin can see different rows.
 const administrationQueryKey = (actingUserId: string) =>
   ['administration', actingUserId] as const
 
+// Load brokerages, users, roles, teams, offices, audit entries, and security notes together.
 export function useAdministrationSnapshot(actingUserId: string) {
   return useQuery({
     queryKey: administrationQueryKey(actingUserId),
@@ -22,6 +24,7 @@ export function useAdministrationSnapshot(actingUserId: string) {
   })
 }
 
+// Create a brokerage, refresh the visible snapshot, and tell the user it worked.
 export function useCreateBrokerage(actingUserId: string) {
   const queryClient = useQueryClient()
 
@@ -42,6 +45,7 @@ export function useCreateBrokerage(actingUserId: string) {
   })
 }
 
+// Update a user's role and reload the admin table so permissions stay accurate.
 export function useUpdateUserRole(actingUserId: string) {
   const queryClient = useQueryClient()
 
@@ -66,6 +70,7 @@ export function useUpdateUserRole(actingUserId: string) {
   })
 }
 
+// Toggle a single direct permission and then refresh the audit trail.
 export function useUpdateUserPermission(actingUserId: string) {
   const queryClient = useQueryClient()
 

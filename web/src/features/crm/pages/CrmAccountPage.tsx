@@ -54,7 +54,9 @@ type EditAccountForm = Pick<
   | 'status'
 >
 
+// This page is the detailed workspace for one CRM account.
 export function CrmAccountPage() {
+  // React Router reads :accountId from the URL, for example /crm/accounts/harbour-fresh.
   const { accountId } = useParams()
   const navigate = useNavigate()
   const { data: account, isLoading } = useCrmAccount(accountId ?? '')
@@ -64,13 +66,16 @@ export function CrmAccountPage() {
   const [form, setForm] = useState<EditAccountForm | null>(null)
 
   if (isLoading) {
+    // Show a small loading message while React Query waits for the API response.
     return <Text>Loading account...</Text>
   }
 
   if (!account) {
+    // If the account cannot be found, send the user back to the CRM overview.
     return <Navigate to="/crm" replace />
   }
 
+  // The sample workflow advances further when an account needs review or is at risk.
   const activeRenewalStep = account.status === 'Active' ? 1 : 2
 
   async function handleUpdateAccount() {
@@ -79,6 +84,7 @@ export function CrmAccountPage() {
     }
 
     await updateAccount.mutateAsync({
+      // The modal only edits account summary fields, so we preserve the nested lists.
       ...form,
       missingInfo: account.missingInfo,
       contacts: account.contacts,
@@ -97,6 +103,7 @@ export function CrmAccountPage() {
     }
 
     await deleteAccount.mutateAsync(account.id)
+    // After deletion, this detail page would no longer have a record to show.
     navigate('/crm')
   }
 
@@ -105,6 +112,7 @@ export function CrmAccountPage() {
       <Modal opened={isEditOpen} onClose={() => setIsEditOpen(false)} title="Edit CRM account">
         {form ? (
           <div className="crm-form-grid">
+            {/* The edit modal writes into local form state until the broker clicks Save. */}
             <TextInput
               label="Account name"
               onChange={(event) => setForm({ ...form, name: event.currentTarget.value })}
@@ -281,6 +289,7 @@ export function CrmAccountPage() {
             <Title order={3}>Contacts and roles</Title>
           </Group>
           <Stack gap="sm">
+            {/* Contacts are nested inside the selected CRM account. */}
             {account.contacts.map((contact) => (
               <div className="crm-contact-card" key={contact.id}>
                 <div>
@@ -311,6 +320,7 @@ export function CrmAccountPage() {
             <Title order={3}>Relationship timeline</Title>
           </Group>
           <Timeline active={account.activities.length - 1} bulletSize={28} lineWidth={2}>
+            {/* Timeline turns account activity records into a chronological story. */}
             {account.activities.map((activity) => (
               <Timeline.Item key={activity.id} title={activity.title}>
                 <Text size="sm" c="dimmed">
@@ -342,6 +352,7 @@ export function CrmAccountPage() {
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
+              {/* Policies are shown in a table because brokers compare these fields side by side. */}
               {account.policies.map((policy) => (
                 <Table.Tr key={policy.id}>
                   <Table.Td>{policy.product}</Table.Td>

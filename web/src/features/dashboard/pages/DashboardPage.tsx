@@ -8,6 +8,8 @@ import {
 import { PageHeader } from '../../../components/common/PageHeader'
 import { StatCard } from '../components/StatCard'
 
+// These are temporary dashboard metrics shown as cards.
+// Later they can come from the API without changing how the cards render.
 const metrics = [
   {
     label: 'Open quotes',
@@ -41,6 +43,7 @@ export function DashboardPage() {
         actions={<Button leftSection={<IconPlus size={18} />}>New quote</Button>}
       />
       <div className="dashboard-grid">
+        {/* Mapping turns the metric array into one StatCard per item. */}
         {metrics.map((metric) => (
           <StatCard key={metric.label} {...metric} />
         ))}

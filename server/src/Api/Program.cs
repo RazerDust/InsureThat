@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Infrastructure.Repositories;
 
+// Program.cs wires up the web server: services first, then the HTTP request pipeline.
 var builder = WebApplication.CreateBuilder(args);
 
 // Controllers are C# classes that group related HTTP endpoints.
@@ -32,9 +33,11 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    // In development, expose OpenAPI so API routes can be inspected by tools.
     app.MapOpenApi();
 }
 
+// These middleware calls run in order for every HTTP request.
 app.UseHttpsRedirection();
 app.UseCors("LocalFrontend");
 app.MapControllers();

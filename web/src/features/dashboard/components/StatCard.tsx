@@ -15,6 +15,7 @@ const toneColors: Record<StatCardProps['tone'], string> = {
   orange: 'orange',
 }
 
+// StatCard is a reusable summary tile for dashboard-style numbers.
 export function StatCard({ helper, icon, label, tone, value }: StatCardProps) {
   return (
     <Card className="stat-card" withBorder>

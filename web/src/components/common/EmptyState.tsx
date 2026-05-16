@@ -5,6 +5,8 @@ type EmptyStateProps = {
   title: string
 }
 
+// EmptyState is shown when a page has no records to display.
+// Reusing it keeps empty screens friendly and consistent across features.
 export function EmptyState({ message, title }: EmptyStateProps) {
   return (
     <Paper className="empty-state" withBorder>

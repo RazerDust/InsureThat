@@ -8,6 +8,7 @@ namespace Api.Controllers;
 [Route("api/admin")]
 public sealed class AdministrationController : ControllerBase
 {
+    // This header is a temporary stand-in for the signed-in user id.
     private const string ActingUserHeader = "X-Acting-User-Id";
     private readonly IAdministrationRepository _administration;
 
@@ -31,6 +32,7 @@ public sealed class AdministrationController : ControllerBase
         CreateBrokerageDto request,
         CancellationToken cancellationToken)
     {
+        // The repository returns null when the acting user is not allowed to create tenants.
         var brokerage = await _administration.CreateBrokerageAsync(GetActingUserId(), request, cancellationToken);
 
         return brokerage is null
@@ -44,6 +46,7 @@ public sealed class AdministrationController : ControllerBase
         UpdateUserRoleDto request,
         CancellationToken cancellationToken)
     {
+        // NotFound covers both missing records and records hidden by tenant rules.
         var user = await _administration.UpdateUserRoleAsync(GetActingUserId(), userId, request, cancellationToken);
 
         return user is null ? NotFound() : Ok(user);
@@ -55,6 +58,7 @@ public sealed class AdministrationController : ControllerBase
         UpdateUserPermissionDto request,
         CancellationToken cancellationToken)
     {
+        // Permission changes are checked and audited inside the repository.
         var user = await _administration.UpdateUserPermissionAsync(GetActingUserId(), userId, request, cancellationToken);
 
         return user is null ? NotFound() : Ok(user);

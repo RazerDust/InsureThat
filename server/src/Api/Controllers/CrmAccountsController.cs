@@ -8,6 +8,7 @@ namespace Api.Controllers;
 [Route("api/crm/accounts")]
 public sealed class CrmAccountsController : ControllerBase
 {
+    // The controller talks to an interface, so the storage can change later without changing routes.
     private readonly ICrmAccountRepository _accounts;
 
     public CrmAccountsController(ICrmAccountRepository accounts)

@@ -4,6 +4,7 @@ namespace Application.DTOs;
 // It is the shape of data that our API sends to, and receives from, the frontend.
 public sealed class CrmAccountDto
 {
+    // Id is the stable value used in URLs such as /crm/accounts/harbour-fresh.
     public required string Id { get; set; }
     public required string Name { get; set; }
     public required string EntityType { get; set; }
@@ -16,6 +17,7 @@ public sealed class CrmAccountDto
     public int ComplianceScore { get; set; }
     public required string Risk { get; set; }
     public required string AiSummary { get; set; }
+    // Nested lists let one account carry its related CRM workspace data.
     public List<string> MissingInfo { get; set; } = [];
     public List<CrmContactDto> Contacts { get; set; } = [];
     public List<CrmPolicyDto> Policies { get; set; } = [];
@@ -27,6 +29,7 @@ public sealed class CrmAccountDto
 
 public sealed class CreateCrmAccountDto
 {
+    // Create requests do not include Id because the repository creates one.
     public required string Name { get; set; }
     public required string EntityType { get; set; }
     public required string Segment { get; set; }
@@ -49,6 +52,7 @@ public sealed class CreateCrmAccountDto
 
 public sealed class UpdateCrmAccountDto
 {
+    // Update requests carry the editable account fields; the route supplies the Id.
     public required string Name { get; set; }
     public required string EntityType { get; set; }
     public required string Segment { get; set; }
