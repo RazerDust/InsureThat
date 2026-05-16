@@ -10,6 +10,7 @@ import {
 } from '@mantine/core'
 import {
   IconBell,
+  IconBuildingSkyscraper,
   IconDashboard,
   IconLogin2,
   IconMoon,
@@ -28,6 +29,7 @@ type NavigationItem = {
 
 const navigationItems: NavigationItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: <IconDashboard size={18} /> },
+  { to: '/crm', label: 'CRM', icon: <IconBuildingSkyscraper size={18} /> },
   { to: '/users', label: 'Users', icon: <IconUsers size={18} /> },
   { to: '/login', label: 'Sign in', icon: <IconLogin2 size={18} /> },
 ]
