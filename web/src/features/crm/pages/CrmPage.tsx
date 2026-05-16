@@ -4,6 +4,8 @@ import {
   Button,
   Card,
   Group,
+  Modal,
+  NumberInput,
   Progress,
   RingProgress,
   Select,
@@ -14,6 +16,7 @@ import {
   Tabs,
   Text,
   TextInput,
+  Textarea,
   ThemeIcon,
   Title,
   Tooltip,
@@ -39,18 +42,51 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../../components/common/PageHeader'
 import { crmAccounts, crmStatusColors, formatCurrency } from '../data'
+import { useCreateCrmAccount, useCrmAccounts } from '../hooks'
+
+type AccountFormState = {
+  aiSummary: string
+  complianceScore: number
+  entityType: string
+  name: string
+  owner: string
+  premium: number
+  renewalDate: string
+  revenue: number
+  risk: string
+  segment: string
+  status: 'Active' | 'Review' | 'At risk'
+}
+
+const emptyAccountForm: AccountFormState = {
+  aiSummary: 'New CRM account created by the broker team.',
+  complianceScore: 75,
+  entityType: 'Company',
+  name: '',
+  owner: '',
+  premium: 0,
+  renewalDate: '2026-12-31',
+  revenue: 0,
+  risk: 'New account requires discovery and compliance evidence.',
+  segment: '',
+  status: 'Active',
+}
 
 export function CrmPage() {
+  const { data: accounts = crmAccounts } = useCrmAccounts()
+  const createAccount = useCreateCrmAccount()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [workMode, setWorkMode] = useState('relationship')
   const [selectedAccountId, setSelectedAccountId] = useState(crmAccounts[0].id)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [form, setForm] = useState<AccountFormState>(emptyAccountForm)
 
   const filteredAccounts = useMemo(() => {
     const lowerSearch = search.toLowerCase()
 
     // Keep all filtering in one place so the table, insight panel and selected record agree.
-    return crmAccounts.filter((account) => {
+    return accounts.filter((account) => {
       const matchesSearch =
         account.name.toLowerCase().includes(lowerSearch) ||
         account.segment.toLowerCase().includes(lowerSearch) ||
@@ -59,24 +95,126 @@ export function CrmPage() {
 
       return matchesSearch && matchesStatus
     })
-  }, [search, statusFilter])
+  }, [accounts, search, statusFilter])
 
   const selectedAccount =
     filteredAccounts.find((account) => account.id === selectedAccountId) ??
     filteredAccounts[0] ??
+    accounts[0] ??
     crmAccounts[0]
 
-  const openTasks = crmAccounts.flatMap((account) =>
+  const openTasks = accounts.flatMap((account) =>
     account.tasks.filter((task) => task.status !== 'Done'),
   )
-  const totalPremium = crmAccounts.reduce((sum, account) => sum + account.premium, 0)
+  const totalPremium = accounts.reduce((sum, account) => sum + account.premium, 0)
   const averageCompliance = Math.round(
-    crmAccounts.reduce((sum, account) => sum + account.complianceScore, 0) /
-      crmAccounts.length,
+    accounts.reduce((sum, account) => sum + account.complianceScore, 0) /
+      Math.max(accounts.length, 1),
   )
+
+  async function handleCreateAccount() {
+    // The nested lists start empty; brokers can add those detailed records later.
+    const account = await createAccount.mutateAsync({
+      ...form,
+      missingInfo: ['Needs analysis', 'Terms of engagement', 'Primary contact'],
+      contacts: [],
+      policies: [],
+      claims: [],
+      tasks: [],
+      documents: [],
+      activities: [
+        {
+          id: `activity-${Date.now()}`,
+          date: 'Today',
+          title: 'Account created',
+          detail: 'Broker created the CRM account from the workspace.',
+          kind: 'Task',
+        },
+      ],
+    })
+
+    setSelectedAccountId(account.id)
+    setForm(emptyAccountForm)
+    setIsCreateOpen(false)
+  }
 
   return (
     <section className="page-stack">
+      <Modal
+        opened={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        title="New CRM account"
+      >
+        <div className="crm-form-grid">
+          <TextInput
+            label="Account name"
+            onChange={(event) => setForm({ ...form, name: event.currentTarget.value })}
+            value={form.name}
+          />
+          <TextInput
+            label="Owner"
+            onChange={(event) => setForm({ ...form, owner: event.currentTarget.value })}
+            value={form.owner}
+          />
+          <TextInput
+            label="Segment"
+            onChange={(event) => setForm({ ...form, segment: event.currentTarget.value })}
+            value={form.segment}
+          />
+          <TextInput
+            label="Renewal date"
+            onChange={(event) => setForm({ ...form, renewalDate: event.currentTarget.value })}
+            value={form.renewalDate}
+          />
+          <Select
+            data={['Company', 'Individual', 'Partnership', 'Trust']}
+            label="Entity type"
+            onChange={(value) => setForm({ ...form, entityType: value ?? 'Company' })}
+            value={form.entityType}
+          />
+          <Select
+            data={['Active', 'Review', 'At risk']}
+            label="Status"
+            onChange={(value) =>
+              setForm({ ...form, status: (value as AccountFormState['status']) ?? 'Active' })
+            }
+            value={form.status}
+          />
+          <NumberInput
+            label="Premium"
+            min={0}
+            onChange={(value) => setForm({ ...form, premium: Number(value) || 0 })}
+            value={form.premium}
+          />
+          <NumberInput
+            label="Revenue"
+            min={0}
+            onChange={(value) => setForm({ ...form, revenue: Number(value) || 0 })}
+            value={form.revenue}
+          />
+          <Textarea
+            className="crm-form-span"
+            label="Risk note"
+            onChange={(event) => setForm({ ...form, risk: event.currentTarget.value })}
+            value={form.risk}
+          />
+          <Textarea
+            className="crm-form-span"
+            label="AI summary"
+            onChange={(event) => setForm({ ...form, aiSummary: event.currentTarget.value })}
+            value={form.aiSummary}
+          />
+          <Button
+            className="crm-form-span"
+            disabled={!form.name || !form.owner || !form.segment}
+            loading={createAccount.isPending}
+            onClick={handleCreateAccount}
+          >
+            Create account
+          </Button>
+        </div>
+      </Modal>
+
       <PageHeader
         title="CRM"
         description="A broker workspace for accounts, contacts, relationships, activities and AI-assisted client action."
@@ -85,7 +223,9 @@ export function CrmPage() {
             <Button leftSection={<IconMail size={18} />} variant="light">
               Draft email
             </Button>
-            <Button leftSection={<IconPlus size={18} />}>New account</Button>
+            <Button leftSection={<IconPlus size={18} />} onClick={() => setIsCreateOpen(true)}>
+              New account
+            </Button>
           </Group>
         }
       />
@@ -94,7 +234,7 @@ export function CrmPage() {
         <CrmMetric
           icon={<IconBuildingSkyscraper size={20} />}
           label="Managed accounts"
-          value={crmAccounts.length.toString()}
+          value={accounts.length.toString()}
           helper="Across CRM portfolio"
         />
         <CrmMetric
