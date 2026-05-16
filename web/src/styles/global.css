@@ -215,6 +215,16 @@ input {
   background: var(--app-panel);
 }
 
+.crm-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.crm-form-span {
+  grid-column: 1 / -1;
+}
+
 .crm-workspace-grid,
 .crm-account-hero {
   display: grid;
@@ -341,6 +351,7 @@ input {
   }
 
   .crm-command-bar,
+  .crm-form-grid,
   .crm-workspace-grid,
   .crm-account-hero {
     grid-template-columns: 1fr;

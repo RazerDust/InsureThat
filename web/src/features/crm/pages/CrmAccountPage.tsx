@@ -4,12 +4,16 @@ import {
   Card,
   Divider,
   Group,
+  Modal,
+  NumberInput,
   Progress,
   SimpleGrid,
   Stack,
   Stepper,
   Table,
   Text,
+  TextInput,
+  Textarea,
   ThemeIcon,
   Timeline,
   Title,
@@ -17,6 +21,9 @@ import {
 import {
   IconArrowLeft,
   IconBriefcase,
+  IconDeviceFloppy,
+  IconPencil,
+  IconTrash,
   IconFileText,
   IconMail,
   IconPhone,
@@ -25,13 +32,40 @@ import {
   IconTimeline,
   IconUserCheck,
 } from '@tabler/icons-react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { PageHeader } from '../../../components/common/PageHeader'
-import { crmAccounts, crmStatusColors, formatCurrency } from '../data'
+import { crmStatusColors, formatCurrency } from '../data'
+import { useCrmAccount, useDeleteCrmAccount, useUpdateCrmAccount } from '../hooks'
+import type { SaveCrmAccountPayload } from '../api'
+
+type EditAccountForm = Pick<
+  SaveCrmAccountPayload,
+  | 'aiSummary'
+  | 'complianceScore'
+  | 'entityType'
+  | 'name'
+  | 'owner'
+  | 'premium'
+  | 'renewalDate'
+  | 'revenue'
+  | 'risk'
+  | 'segment'
+  | 'status'
+>
 
 export function CrmAccountPage() {
   const { accountId } = useParams()
-  const account = crmAccounts.find((candidate) => candidate.id === accountId)
+  const navigate = useNavigate()
+  const { data: account, isLoading } = useCrmAccount(accountId ?? '')
+  const updateAccount = useUpdateCrmAccount(accountId ?? '')
+  const deleteAccount = useDeleteCrmAccount()
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [form, setForm] = useState<EditAccountForm | null>(null)
+
+  if (isLoading) {
+    return <Text>Loading account...</Text>
+  }
 
   if (!account) {
     return <Navigate to="/crm" replace />
@@ -39,8 +73,94 @@ export function CrmAccountPage() {
 
   const activeRenewalStep = account.status === 'Active' ? 1 : 2
 
+  async function handleUpdateAccount() {
+    if (!account || !form) {
+      return
+    }
+
+    await updateAccount.mutateAsync({
+      ...form,
+      missingInfo: account.missingInfo,
+      contacts: account.contacts,
+      policies: account.policies,
+      claims: account.claims,
+      tasks: account.tasks,
+      documents: account.documents,
+      activities: account.activities,
+    })
+    setIsEditOpen(false)
+  }
+
+  async function handleDeleteAccount() {
+    if (!account) {
+      return
+    }
+
+    await deleteAccount.mutateAsync(account.id)
+    navigate('/crm')
+  }
+
   return (
     <section className="page-stack">
+      <Modal opened={isEditOpen} onClose={() => setIsEditOpen(false)} title="Edit CRM account">
+        {form ? (
+          <div className="crm-form-grid">
+            <TextInput
+              label="Account name"
+              onChange={(event) => setForm({ ...form, name: event.currentTarget.value })}
+              value={form.name}
+            />
+            <TextInput
+              label="Owner"
+              onChange={(event) => setForm({ ...form, owner: event.currentTarget.value })}
+              value={form.owner}
+            />
+            <TextInput
+              label="Segment"
+              onChange={(event) => setForm({ ...form, segment: event.currentTarget.value })}
+              value={form.segment}
+            />
+            <TextInput
+              label="Renewal date"
+              onChange={(event) => setForm({ ...form, renewalDate: event.currentTarget.value })}
+              value={form.renewalDate}
+            />
+            <NumberInput
+              label="Premium"
+              min={0}
+              onChange={(value) => setForm({ ...form, premium: Number(value) || 0 })}
+              value={form.premium}
+            />
+            <NumberInput
+              label="Revenue"
+              min={0}
+              onChange={(value) => setForm({ ...form, revenue: Number(value) || 0 })}
+              value={form.revenue}
+            />
+            <Textarea
+              className="crm-form-span"
+              label="Risk note"
+              onChange={(event) => setForm({ ...form, risk: event.currentTarget.value })}
+              value={form.risk}
+            />
+            <Textarea
+              className="crm-form-span"
+              label="AI summary"
+              onChange={(event) => setForm({ ...form, aiSummary: event.currentTarget.value })}
+              value={form.aiSummary}
+            />
+            <Button
+              className="crm-form-span"
+              leftSection={<IconDeviceFloppy size={18} />}
+              loading={updateAccount.isPending}
+              onClick={handleUpdateAccount}
+            >
+              Save changes
+            </Button>
+          </div>
+        ) : null}
+      </Modal>
+
       <PageHeader
         title={account.name}
         description={`${account.entityType} account · ${account.segment} · owner ${account.owner}`}
@@ -53,6 +173,38 @@ export function CrmAccountPage() {
               variant="light"
             >
               CRM
+            </Button>
+            <Button
+              leftSection={<IconPencil size={18} />}
+              onClick={() => {
+                // Copy the editable fields into form state when the broker opens the modal.
+                setForm({
+                  aiSummary: account.aiSummary,
+                  complianceScore: account.complianceScore,
+                  entityType: account.entityType,
+                  name: account.name,
+                  owner: account.owner,
+                  premium: account.premium,
+                  renewalDate: account.renewalDate,
+                  revenue: account.revenue,
+                  risk: account.risk,
+                  segment: account.segment,
+                  status: account.status,
+                })
+                setIsEditOpen(true)
+              }}
+              variant="light"
+            >
+              Edit
+            </Button>
+            <Button
+              color="red"
+              leftSection={<IconTrash size={18} />}
+              loading={deleteAccount.isPending}
+              onClick={handleDeleteAccount}
+              variant="light"
+            >
+              Delete
             </Button>
             <Button leftSection={<IconMail size={18} />}>Client email</Button>
           </Group>
