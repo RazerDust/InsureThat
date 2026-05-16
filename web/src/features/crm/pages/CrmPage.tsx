@@ -34,16 +34,11 @@ import {
   IconSparkles,
   IconUsersGroup,
 } from '@tabler/icons-react'
+import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../../components/common/PageHeader'
-import { crmAccounts, formatCurrency } from '../data'
-
-const statusColors = {
-  Active: 'green',
-  Review: 'yellow',
-  'At risk': 'red',
-} as const
+import { crmAccounts, crmStatusColors, formatCurrency } from '../data'
 
 export function CrmPage() {
   const [search, setSearch] = useState('')
@@ -189,7 +184,7 @@ export function CrmPage() {
                     </Table.Td>
                     <Table.Td>{account.owner}</Table.Td>
                     <Table.Td>
-                      <Badge color={statusColors[account.status]} variant="light">
+                      <Badge color={crmStatusColors[account.status]} variant="light">
                         {account.status}
                       </Badge>
                     </Table.Td>
@@ -324,7 +319,7 @@ export function CrmPage() {
 
 type CrmMetricProps = {
   helper: string
-  icon: React.ReactNode
+  icon: ReactNode
   label: string
   value: string
 }
@@ -349,7 +344,7 @@ function CrmMetric({ helper, icon, label, value }: CrmMetricProps) {
 }
 
 type CrmQueueProps = {
-  icon: React.ReactNode
+  icon: ReactNode
   items: string[]
   title: string
 }

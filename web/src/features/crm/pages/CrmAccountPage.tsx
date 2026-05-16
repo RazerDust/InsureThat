@@ -27,13 +27,7 @@ import {
 } from '@tabler/icons-react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { PageHeader } from '../../../components/common/PageHeader'
-import { crmAccounts, formatCurrency } from '../data'
-
-const statusColors = {
-  Active: 'green',
-  Review: 'yellow',
-  'At risk': 'red',
-} as const
+import { crmAccounts, crmStatusColors, formatCurrency } from '../data'
 
 export function CrmAccountPage() {
   const { accountId } = useParams()
@@ -69,7 +63,7 @@ export function CrmAccountPage() {
         <Card className="crm-panel" padding="lg">
           <Group justify="space-between" align="flex-start">
             <div>
-              <Badge color={statusColors[account.status]} variant="light">
+              <Badge color={crmStatusColors[account.status]} variant="light">
                 {account.status}
               </Badge>
               <Title order={2} mt="xs">

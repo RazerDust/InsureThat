@@ -366,6 +366,14 @@ export const crmAccounts: CrmAccount[] = [
   },
 ]
 
+// These colours are used anywhere an account status badge appears.
+// Keeping them here stops the overview and detail pages drifting apart.
+export const crmStatusColors = {
+  Active: 'green',
+  Review: 'yellow',
+  'At risk': 'red',
+} as const satisfies Record<CrmAccount['status'], string>
+
 export const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-AU', {
     currency: 'AUD',

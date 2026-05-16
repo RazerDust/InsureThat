@@ -258,8 +258,7 @@ input {
 
 .crm-contact-line,
 .crm-contact-card,
-.crm-task-line,
-.crm-document-card {
+.crm-task-line {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -287,7 +286,10 @@ input {
 }
 
 .crm-document-card {
-  display: block;
+  padding: 12px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--app-panel) 92%, var(--app-bg));
 }
 
 @media (max-width: 1340px) {
