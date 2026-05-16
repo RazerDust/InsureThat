@@ -1,0 +1,201 @@
+:root {
+  --app-bg: #f6f8fb;
+  --app-border: #dfe5ec;
+  --app-panel: #ffffff;
+  --app-text: #16202a;
+  --app-muted: #667085;
+  --app-accent: #0f766e;
+  --app-accent-soft: #e6f4f1;
+  --app-sidebar: #10202f;
+  --app-sidebar-muted: #9fb1c1;
+  --app-sidebar-active: #17364a;
+  color: var(--app-text);
+  background: var(--app-bg);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--app-bg);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 24px 18px;
+  color: #ffffff;
+  background: var(--app-sidebar);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.app-brand {
+  min-height: 48px;
+  padding: 0 8px;
+}
+
+.app-brand svg {
+  color: #5eead4;
+}
+
+.app-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 12px;
+  color: var(--app-sidebar-muted);
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.app-nav-link:hover,
+.app-nav-link.is-active {
+  color: #ffffff;
+  background: var(--app-sidebar-active);
+}
+
+.app-main {
+  min-width: 0;
+  padding: 32px;
+}
+
+.page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1120px;
+}
+
+.page-header {
+  gap: 16px;
+}
+
+.page-header-actions {
+  flex-shrink: 0;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 154px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.stat-value {
+  margin-top: 6px;
+  color: var(--app-text);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.auth-form,
+.empty-state {
+  width: min(100%, 440px);
+  padding: 24px;
+  border-radius: 8px;
+  background: var(--app-panel);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.data-table {
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-panel);
+}
+
+.user-avatar {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--app-accent);
+  font-weight: 700;
+  background: var(--app-accent-soft);
+  border-radius: 50%;
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .app-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .app-nav-link {
+    flex: 0 0 auto;
+  }
+
+  .app-main {
+    padding: 24px 16px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions .mantine-Button-root {
+    width: 100%;
+  }
+}
