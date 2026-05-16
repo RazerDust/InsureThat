@@ -12,7 +12,8 @@ export function AppProviders({ children }: PropsWithChildren) {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <MantineProvider>
+        {/* Mantine stores the selected colour mode in local storage for us. */}
+        <MantineProvider defaultColorScheme="light">
           <Notifications position="top-right" />
           {children}
         </MantineProvider>

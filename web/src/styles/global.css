@@ -20,6 +20,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Mantine adds this attribute to the page when the user chooses dark mode. */
+:root[data-mantine-color-scheme="dark"] {
+  --app-bg: #0d1318;
+  --app-border: #25313d;
+  --app-panel: #151d24;
+  --app-text: #f1f5f9;
+  --app-muted: #9aa8b6;
+  --app-accent: #2dd4bf;
+  --app-accent-soft: rgba(45, 212, 191, 0.14);
+  --app-sidebar: #071018;
+  --app-sidebar-muted: #9fb1c1;
+  --app-sidebar-active: #12313d;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -84,9 +98,40 @@ input {
   background: var(--app-sidebar-active);
 }
 
+.app-workspace {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 32px;
+  background: color-mix(in srgb, var(--app-panel) 94%, transparent);
+  border-bottom: 1px solid var(--app-border);
+  backdrop-filter: blur(12px);
+}
+
+.app-account {
+  padding-left: 6px;
+}
+
 .app-main {
   min-width: 0;
   padding: 32px;
+}
+
+.app-content {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
 }
 
 .page-stack {
@@ -94,7 +139,6 @@ input {
   flex-direction: column;
   gap: 24px;
   width: 100%;
-  max-width: 1120px;
 }
 
 .page-header {
@@ -168,7 +212,7 @@ input {
   .app-sidebar {
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 3;
     gap: 16px;
     padding: 16px;
   }
@@ -181,6 +225,17 @@ input {
 
   .app-nav-link {
     flex: 0 0 auto;
+  }
+
+  .app-topbar {
+    position: static;
+    min-height: auto;
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .app-account {
+    display: none;
   }
 
   .app-main {

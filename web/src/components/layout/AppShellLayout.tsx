@@ -1,8 +1,20 @@
-import { Group, Text } from '@mantine/core'
 import {
+  ActionIcon,
+  Avatar,
+  Badge,
+  Group,
+  Text,
+  Tooltip,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from '@mantine/core'
+import {
+  IconBell,
   IconDashboard,
   IconLogin2,
+  IconMoon,
   IconShieldCheck,
+  IconSun,
   IconUsers,
 } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
@@ -21,6 +33,10 @@ const navigationItems: NavigationItem[] = [
 ]
 
 export function AppShellLayout() {
+  const { toggleColorScheme } = useMantineColorScheme()
+  const colorScheme = useComputedColorScheme('light')
+  const isDarkMode = colorScheme === 'dark'
+
   return (
     <div className="app-shell">
       <aside className="app-sidebar">
@@ -50,9 +66,66 @@ export function AppShellLayout() {
         </nav>
       </aside>
 
-      <main className="app-main">
-        <Outlet />
-      </main>
+      <div className="app-workspace">
+        <header className="app-topbar">
+          <div>
+            <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+              Workspace
+            </Text>
+            <Text fw={700}>Insurance operations</Text>
+          </div>
+
+          <Group gap="sm" wrap="nowrap">
+            <Badge variant="light" color="teal">
+              Live
+            </Badge>
+
+            <Tooltip label="Notifications">
+              <ActionIcon
+                aria-label="View notifications"
+                radius="md"
+                size="lg"
+                variant="subtle"
+              >
+                <IconBell size={20} />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip label={isDarkMode ? 'Use light mode' : 'Use dark mode'}>
+              <ActionIcon
+                aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                onClick={() => toggleColorScheme()}
+                radius="md"
+                size="lg"
+                variant="light"
+              >
+                {/* Show the action the button will perform next. */}
+                {isDarkMode ? <IconSun size={20} /> : <IconMoon size={20} />}
+              </ActionIcon>
+            </Tooltip>
+
+            <Group className="app-account" gap="sm" wrap="nowrap">
+              <Avatar color="teal" radius="xl" size="sm">
+                CW
+              </Avatar>
+              <div>
+                <Text size="sm" fw={700}>
+                  Chris White
+                </Text>
+                <Text size="xs" c="dimmed">
+                  Admin
+                </Text>
+              </div>
+            </Group>
+          </Group>
+        </header>
+
+        <main className="app-main">
+          <div className="app-content">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
